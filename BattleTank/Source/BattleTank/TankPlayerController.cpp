@@ -2,9 +2,14 @@
 
 
 #include "TankPlayerController.h"
-#include "GameFramework/Pawn.h"
+#include "BattleTank.h"
 
 
+void ATankPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("PlayerController Begin Play"));
+}
 
 ATank* ATankPlayerController::GetControlledTank() const
 (
