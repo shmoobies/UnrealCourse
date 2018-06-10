@@ -44,21 +44,13 @@ void ATankPlayerController::AimTowardsCrosshair()
 		//Get world location if linetrace through crosshair
 		//If it hits the landscape
 			//Tell controlled tank to aim at this point
+		UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *HitLocation.ToString());
 	}
 }
 
 //Get world location of linetrace through crosshar, true if hits landscape
 bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
 {
-	/*FHitResult Hit(ForceInit);
-	FCollisionQueryParams TraceChannel = FCollisionQueryParams(FName(TEXT("AimTrace")),true, this);
-	GetControlledTank()->ActorLineTraceSingle(Hit, GetPawn()->GetActorLocation(), HitLocation, ECC_Pawn, TraceChannel);
-	if (Hit.bBlockingHit)
-	{
-		return true;
-	}
-	*/
-
 	//Find crosshair position in pixel coordinates
 	int32 ViewportX, ViewportY;
 	GetViewportSize(ViewportX, ViewportY);
@@ -68,11 +60,12 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
 	FVector LookDirection;
 	if (GetLookDirection(ScreenLocation, LookDirection))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Look Direction: %s"), *LookDirection.ToString());
+		//line-trace along that look direction, and see what we hit (up to max range)
+		GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
 
-	//line-trace along that look direction, and wee what w hit (up to max range)
-	HitLocation = FVector(1.0);
+	
+	
 	return true;
 
 
@@ -82,6 +75,29 @@ bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& 
 {
 	FVector WLocation; //To be discarded
 	return DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WLocation, LookDirection);
+}
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
+{
+
+	FHitResult HitResult;
+	auto StartLocation = PlayerCameraManager->GetCameraLocation();
+	auto EndLocation = StartLocation + (LookDirection * LineTraceRange);
+	if (GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		StartLocation,
+		EndLocation,
+		ECollisionChannel::ECC_Visibility)
+		)
+		{
+			//Set hit location
+			HitLocation = HitResult.Location;
+			return true;
+		}
+	HitLocation = FVector(0.0);
+	return false;
+	
+	
 }
 
 
