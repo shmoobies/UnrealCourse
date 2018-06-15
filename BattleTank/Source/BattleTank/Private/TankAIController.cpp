@@ -9,25 +9,6 @@ void ATankAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto ControlledTank = GetControlledTank();
-	if (!ControlledTank)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TankAIPlayerController not possessing a tank"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TankAIPlayerController Possessing: %s"), *(ControlledTank->GetName()));
-	}
-
-	auto FirstPlayerTank = GetPlayerTank();
-	if (!FirstPlayerTank)
-	{
-		UE_LOG(LogTemp, Warning, TEXT(" AI can't locate first player tank"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AI %s found first player tank: %s"), *(ControlledTank->GetName()),*(FirstPlayerTank->GetName()));
-	}
 }
 
 void ATankAIController::Tick(float DeltaTime)
